@@ -42,6 +42,8 @@ dependencies {
     //Implementação Retrofit https://square.github.io/retrofit/
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    //Implementação Picasso https://square.github.io/picasso/#download
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
