@@ -23,7 +23,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     }
 
 
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,19 +36,20 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-    News news = this.news.get(position);
-    holder.binding.tvTitle.setText(news.getTitle());
-    holder.binding.tvDescription.setText(news.getDescription());
+        News news = this.news.get(position);
+        holder.binding.tvTitle.setText(news.getTitle());
+        holder.binding.tvDescription.setText(news.getDescription());
     }
 
     @Override
     public int getItemCount() {
+
         return this.news.size();
     }
 
-    public static class ViewHolder extends  RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final NewsItemBinding binding;
+         private final NewsItemBinding binding;
 
         public ViewHolder(NewsItemBinding binding) {
             super(binding.getRoot());
