@@ -18,12 +18,14 @@ import br.com.andrebalogo.soccernews.domain.News;
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     //Lista de notícias
-    private List<News> news;
+    private final List<News> news;
+    private final favoriteListener favoriteListener;
 
 
     //Recebido pelo construtor pega lista de notícias
-    public NewsAdapter(List<News> news) {
+    public NewsAdapter(List<News> news, favoriteListener favoriteListener) {
         this.news = news;
+        this.favoriteListener = favoriteListener;
     }
 
 
@@ -41,23 +43,39 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         News news = this.news.get(position);
-        holder.binding.tvTitle.setText(news.getTitle());
-        holder.binding.tvDescription.setText(news.getDescription());
-        Picasso.get().load(news.getImage())
+        holder.binding.tvTitle.setText(news.title);
+        holder.binding.tvDescription.setText(news.description);
+        Picasso.get().load(news.image)
                 .fit()
                 .into(holder.binding.ivThumbnail);
-        holder.binding.btOpenLink.setOnClickListener( view -> {
+        //funcionalidade de abrir link.
+        holder.binding.btOpenLink.setOnClickListener(view -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(news.getLink()));
+            i.setData(Uri.parse(news.link));
             holder.itemView.getContext().startActivity(i);
         });
+        //funcionalidade de compartilhar
+        holder.binding.ivShare.setOnClickListener(view -> {
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("Text/plain");
+            i.putExtra(Intent.EXTRA_TITLE, news.title);
+            i.putExtra(Intent.EXTRA_TEXT, news.link);
+            holder.itemView.getContext().startActivity(Intent.createChooser(i, "share via"));
+        });
+        holder.binding.ivFavorite.setOnClickListener(view -> {
+            news.favorite = !news.favorite;
+            this.favoriteListener.onFavorite(news);
+            //reciclerview enxerga qual posição foi flagada.
+            notifyItemChanged(position);
+        } );
+        if {news.favorite) {
+        } else {
+        //TODO
+        }
     }
 
     @Override
-    public int getItemCount() {
-
-        return this.news.size();
-    }
+    public int getItemCount() { return this.news.size(); }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -69,5 +87,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         }
     }
+
+    public interface favoriteListener{
+        void onFavorite(News news);
+
+    }
+
 
 }

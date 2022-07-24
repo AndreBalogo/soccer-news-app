@@ -1,8 +1,11 @@
 package br.com.andrebalogo.soccernews.ui.news;
 
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.room.Room;
 
 import java.util.List;
 
