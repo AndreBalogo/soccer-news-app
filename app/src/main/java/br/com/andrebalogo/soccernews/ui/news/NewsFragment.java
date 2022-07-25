@@ -1,6 +1,5 @@
 package br.com.andrebalogo.soccernews.ui.news;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,18 +9,18 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.room.Room;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import br.com.andrebalogo.soccernews.R;
 import br.com.andrebalogo.soccernews.databinding.FragmentNewsBinding;
 import br.com.andrebalogo.soccernews.ui.adapters.NewsAdapter;
 
 public class NewsFragment extends Fragment {
 
-    private NewsViewModel newsViewModel;
     private FragmentNewsBinding binding;
-    private AppDatabase db;
+    private NewsViewModel newsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         newsViewModel = new ViewModelProvider(this).get(NewsViewModel.class);
@@ -29,20 +28,39 @@ public class NewsFragment extends Fragment {
         binding = FragmentNewsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        db = Room.databaseBuilder(getContext(), AppDatabase.class, "database-name")
-                .allowMainThreadQueries()
-                .build();
-        //Room.DatabaseBuilder(getContext(), AppDatabase.class, "database-name").build();
-
         binding.rvNews.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        observeNews();
+        observeStates();
+
+        binding.srlNews.setOnRefreshListener(newsViewModel::findNews);
+
+        return root;
+    }
+
+    private void observeNews() {
         newsViewModel.getNews().observe(getViewLifecycleOwner(), news -> {
-            //Onde recebe a lista de notícias
-            binding.rvNews.setAdapter(new NewsAdapter(news, updatedNews -> {
-                db.NewsDao().insert(updatedNews);
-                Log.d("TAG FAVORITE:", " clicou");
+            binding.rvNews.setAdapter(new NewsAdapter(news, favoriteNews -> {
+                newsViewModel.saveNews(favoriteNews);
             }));
         });
-        return root;
+    }
+
+    private void observeStates() {
+        //Respeitar o status
+        newsViewModel.getState().observe(getViewLifecycleOwner(), state -> {
+            switch (state) {
+                case DOING:
+                    binding.srlNews.setRefreshing(true);
+                    break;
+                case DONE:
+                    binding.srlNews.setRefreshing(false);
+                    break;
+                case ERROR:
+                    binding.srlNews.setRefreshing(false);
+                    Snackbar.make(binding.srlNews, R.string.error_network, Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -50,4 +68,6 @@ public class NewsFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
 }
